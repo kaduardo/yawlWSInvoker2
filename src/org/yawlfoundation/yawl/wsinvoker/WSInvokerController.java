@@ -74,56 +74,62 @@ public class WSInvokerController extends InterfaceBWebsideController {
                     	webServiceArgsData.getChild(WSInvoker.WS_COMPLEXREQUEST_PARAMNAME);
                     Element wsRequestData = complexRequest != null ? complexRequest : webServiceArgsData;
                     
-                    Object rawReplyFromWebServiceBeingInvoked =
-                    	new WSInvoker().invoke(
-                            		new URL(wsdlLocation),
-                            		serviceName,
-                            		bindingName,
-                            		operationName,
-                            		wsRequestData);
-                    
-                    Map<String, Object> replyFromWebServiceBeingInvoked = 
-                    	WSInvoker.ExtractFields(rawReplyFromWebServiceBeingInvoked);                    	
-                                   
-                    _log.warn("\n\nReply from Web service being invoked is :" +
-                            replyFromWebServiceBeingInvoked);
-
+                    //Dealing with soapfaults
                     Element caseDataBoundForEngine = prepareReplyRootElement(enabledWorkItem, _sessionHandle);
-                    
-                    Map<String, String> outputDataTypes = getOutputDataTypes(enabledWorkItem);
-                    
-                    if (outputDataTypes.containsKey(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME) &&
-                    	rawReplyFromWebServiceBeingInvoked != null)
-                    {               
-                    	if (replyFromWebServiceBeingInvoked.containsKey(WSInvoker.WS_SCALARRESPONSE_PARAMNAME)) {
-                    		throw new IllegalArgumentException(
-                    				"Web service returned a scalar result," +
-                    				" no complex response param possible!");
-                    	}
-                    	System.out.println("replyMsg class = " + rawReplyFromWebServiceBeingInvoked.getClass().getName());
-                		Element content = new Element(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME);
-                        Element response = WSInvoker.Marshall(rawReplyFromWebServiceBeingInvoked);
-                        content.addContent(response);
-                        caseDataBoundForEngine.addContent(content);
-                    }
+                    try {
+                        Object rawReplyFromWebServiceBeingInvoked =
+                            	new WSInvoker().invoke(
+                                    		new URL(wsdlLocation),
+                                    		serviceName,
+                                    		bindingName,
+                                    		operationName,
+                                    		wsRequestData);
 
-                    for (String varName : replyFromWebServiceBeingInvoked.keySet()) {
-                        Object replyMsg = replyFromWebServiceBeingInvoked.get(varName);
-                        System.out.println("replyMsgProperty class = " + replyMsg.getClass().getName());
-                        String varVal = replyMsg.toString();
-                        String outputVarName = findOutputVarName(outputDataTypes.keySet(), varName);
-                        if (outputVarName == null)
-                        {
-                        	_log.warn(varName + " not found in output params");
-                        	continue;
+                        Map<String, Object> replyFromWebServiceBeingInvoked = 
+                        	WSInvoker.ExtractFields(rawReplyFromWebServiceBeingInvoked); 
+                        
+                        _log.warn("\n\nReply from Web service being invoked is :" +
+                                replyFromWebServiceBeingInvoked);    
+
+                        Map<String, String> outputDataTypes = getOutputDataTypes(enabledWorkItem);
+                        if (outputDataTypes.containsKey(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME) &&
+                            	rawReplyFromWebServiceBeingInvoked != null)
+                            {               
+                            	if (replyFromWebServiceBeingInvoked.containsKey(WSInvoker.WS_SCALARRESPONSE_PARAMNAME)) {
+                            		throw new IllegalArgumentException(
+                            				"Web service returned a scalar result," +
+                            				" no complex response param possible!");
+                            	}
+                            	System.out.println("replyMsg class = " + rawReplyFromWebServiceBeingInvoked.getClass().getName());
+                        		Element content = new Element(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME);
+                                Element response = WSInvoker.Marshall(rawReplyFromWebServiceBeingInvoked);
+                                content.addContent(response);
+                                caseDataBoundForEngine.addContent(content);
+                            }
+                        
+                        for (String varName : replyFromWebServiceBeingInvoked.keySet()) {
+                            Object replyMsg = replyFromWebServiceBeingInvoked.get(varName);
+                            System.out.println("replyMsgProperty class = " + replyMsg.getClass().getName());
+                            String varVal = replyMsg.toString();
+                            String outputVarName = findOutputVarName(outputDataTypes.keySet(), varName);
+                            if (outputVarName == null)
+                            {
+                            	_log.warn(varName + " not found in output params");
+                            	continue;
+                            }
+                            String varType = outputDataTypes.get(outputVarName);
+                            if ((varType != null) && (! varType.endsWith("string"))) {
+                                varVal = validateValue(varType, varVal);
+                            }
+                            Element content = new Element(outputVarName);
+                            content.setText(varVal);
+                            caseDataBoundForEngine.addContent(content);
                         }
-                        String varType = outputDataTypes.get(outputVarName);
-                        if ((varType != null) && (! varType.endsWith("string"))) {
-                            varVal = validateValue(varType, varVal);
-                        }
-                        Element content = new Element(outputVarName);
-                        content.setText(varVal);
-                        caseDataBoundForEngine.addContent(content);
+                        
+                    } catch (Exception e) {
+                    	Element errorContent = new Element("errormessage");
+                    	errorContent.setText(e.getMessage());
+                    	caseDataBoundForEngine.addContent(errorContent);
                     }
 
                     _logger.warn("\nResult of item [" +
@@ -210,7 +216,7 @@ public class WSInvokerController extends InterfaceBWebsideController {
     }
 
     public YParameter[] describeRequiredParams() {
-        YParameter[] params = new YParameter[2];
+        YParameter[] params = new YParameter[3];
         YParameter param;
 
         param = new YParameter(null, YParameter._INPUT_PARAM_TYPE);
@@ -233,7 +239,12 @@ public class WSInvokerController extends InterfaceBWebsideController {
         param.setDataTypeAndName(XSD_NCNAME_TYPE, WSDL_OPERATIONNAME_PARAMNAME, XSD_NAMESPACE);
         param.setDocumentation("This is the operation name of the Web service - inside the WSDL.");
         params[1] = param;
-
+        
+        param = new YParameter(null, YParameter._OUTPUT_PARAM_TYPE);
+        param.setDataTypeAndName("string", "errormessage", XSD_NAMESPACE);
+        param.setDocumentation("The error message in case of a Soap fault");
+        params[2] = param;
+        
         return params;
     }
 
