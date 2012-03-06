@@ -86,7 +86,7 @@ public class WSInvoker {
 		//_log.warn("Input data: " + new XMLOutputter().outputString(inputData));
 		
 		JaxWsDynamicClientFactory factory = JaxWsDynamicClientFactory.newInstance();
-		
+		_log.warn("Reading WSDL document from '" + wsdl + "'");
 		Client client = factory.createClient(wsdl.toExternalForm());
 		
 		HTTPConduit conduit = (HTTPConduit) client.getConduit();
