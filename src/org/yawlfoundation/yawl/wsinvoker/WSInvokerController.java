@@ -151,12 +151,24 @@ public class WSInvokerController extends InterfaceBWebsideController {
     	
     	// if web service result is just single value without a name and there is
     	// only one output task param then choose it no matter which name it has -> convenience
-    	if (outputVarNames.size() == 1 && wsResponseVarName.equals(WSInvoker.WS_SCALARRESPONSE_PARAMNAME))
+    	/*if (outputVarNames.size() == 1 && wsResponseVarName.equals(WSInvoker.WS_SCALARRESPONSE_PARAMNAME))
     	{
     		String varName = outputVarNames.iterator().next();
     		if (!varName.equals(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME))
     		{
     			return varName;
+    		}
+    	}*/
+    	// Hack to allow the errorMessage parameter.
+    	if (outputVarNames.size() == 2 && wsResponseVarName.equals(WSInvoker.WS_SCALARRESPONSE_PARAMNAME))
+    	{
+    		for (String varName : outputVarNames) 
+    		{
+    			if (!varName.equals(WSInvoker.WS_COMPLEXRESPONSE_PARAMNAME) && 
+    					!varName.equals("errorMessage")) 
+    			{
+    				return varName;
+    			}
     		}
     	}
     	
