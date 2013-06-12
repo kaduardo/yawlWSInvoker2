@@ -171,7 +171,13 @@
         </servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
-
+    <servlet>
+        <servlet-name>teste</servlet-name>
+        <description>
+            Teste.
+        </description>
+        <jsp-file>/teste.jsp</jsp-file>
+    </servlet>
 
     <!-- Define mappings that are used by the servlet container to
          translate a particular request URI (context-relative) to a
@@ -200,7 +206,11 @@
         <servlet-name>AuthServlet</servlet-name>
         <url-pattern>/authServlet</url-pattern>
     </servlet-mapping>
-
+  
+    <servlet-mapping>
+        <servlet-name>teste</servlet-name>
+        <url-pattern>/teste</url-pattern>
+    </servlet-mapping>
 
     <!--servlet-mapping>
         <servlet-name>ErrorServlet</servlet-name>

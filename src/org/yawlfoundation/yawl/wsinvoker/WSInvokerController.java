@@ -2,7 +2,6 @@ package org.yawlfoundation.yawl.wsinvoker;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.yawlfoundation.yawl.elements.data.YParameter;
 import org.yawlfoundation.yawl.engine.YSpecificationID;
 import org.yawlfoundation.yawl.engine.interfce.TaskInformation;

@@ -29,7 +29,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.cxf.aegis.util.stax.JDOMStreamReader;
@@ -48,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class WSInvoker {
@@ -61,7 +59,7 @@ public class WSInvoker {
 	private Logger _log = Logger.getLogger(this.getClass());
 	
 	@SuppressWarnings("unchecked")
-	private static final Set<Class<?>> SCALAR = new HashSet<Class<?>>(Arrays.asList(
+	protected static final Set<Class<?>> SCALAR = new HashSet<Class<?>>(Arrays.asList(
 	        String.class, Boolean.class, Byte.class, Character.class, Short.class, Integer.class, Float.class, Long.class, Double.class,
 	        BigInteger.class, BigDecimal.class, AtomicBoolean.class, AtomicInteger.class, AtomicLong.class, Date.class, Calendar.class, GregorianCalendar.class,
 	        UUID.class
@@ -195,7 +193,7 @@ public class WSInvoker {
         return returns;
 	}
 	
-	private static Object Unmarshall(final Element xmlElement, final Class<?> clas) throws SAXException
+	protected static Object Unmarshall(final Element xmlElement, final Class<?> clas) throws SAXException
 	{	
 		final JDOMStreamReader reader = new JDOMStreamReader(xmlElement);
 
@@ -250,7 +248,7 @@ public class WSInvoker {
 		return rootElement;
 	}
 
-	private static BindingOperationInfo findOperation(Collection<BindingOperationInfo> ops, String opName)
+	protected static BindingOperationInfo findOperation(Collection<BindingOperationInfo> ops, String opName)
 	{
 		for (BindingOperationInfo op : ops)
 		{
@@ -262,7 +260,7 @@ public class WSInvoker {
 		throw new IllegalArgumentException("Operation " + opName + " not found!");
 	}
 	
-	private static ServiceInfo findService(List<ServiceInfo> services, String serviceName)
+	protected static ServiceInfo findService(Collection<ServiceInfo> services, String serviceName)
 	{
 		for (ServiceInfo service : services)
 		{
@@ -274,7 +272,7 @@ public class WSInvoker {
 		throw new IllegalArgumentException("Service " + serviceName + " not found!");
 	}
 	
-	private static BindingInfo findBinding(Collection<BindingInfo> bindings, String bindingName)
+	protected static BindingInfo findBinding(Collection<BindingInfo> bindings, String bindingName)
 	{
 		for (BindingInfo binding : bindings)
 		{
