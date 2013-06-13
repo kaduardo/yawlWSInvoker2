@@ -27,8 +27,8 @@ public class Testing {
 		
 		try {
 			String wsdlLocation = "http://localhost:8082/Architecture.xadl.proxy.service/ReconfigurationProxyService?wsdl";
-			String serviceName = "{http://service.proxy.xadl.architecture/}ReconfigurationProxyService";
-			String bindingName = "[BindingInfo http://schemas.xmlsoap.org/wsdl/soap/]";
+			String serviceName = "ReconfigurationProxyService";
+			String bindingName = "ReconfigurationProxyServicePortBinding";
 			String operationName = "getMyArchInstance";
 
 			Element wsRequestData = new Element("elemento");
@@ -49,7 +49,7 @@ public class Testing {
 	        BindingInfo binding = StringUtils.isEmpty(bindingName)
 	               							? bindings.iterator().next()
 	               							: WSInvoker.findBinding(bindings, bindingName);
-	        System.out.println("Binding: " + binding);
+	        System.out.println("Binding: " + binding.getName());
 	        
 	        BindingOperationInfo operation = WSInvoker.findOperation(binding.getOperations(), operationName);
 	        System.out.println("Operation: " + operation);

@@ -87,12 +87,6 @@ public class WSInvoker {
 		_log.warn("Reading WSDL document from '" + wsdl + "'");
 		Client client = factory.createClient(wsdl.toExternalForm());
 		
-		HTTPConduit conduit = (HTTPConduit) client.getConduit();
-		HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-		// chunking is enabled by default but sometimes causes problems
-		httpClientPolicy.setAllowChunking(false);
-		conduit.setClient(httpClientPolicy);
-		
         Endpoint endpoint = client.getEndpoint();
         
         List<ServiceInfo> serviceInfos = endpoint.getService().getServiceInfos();
@@ -107,7 +101,7 @@ public class WSInvoker {
         							? bindings.iterator().next()
         							: findBinding(bindings, bindingName);
         							
-        _log.warn("Binding: " + binding);
+        _log.warn("Binding: " + binding.getName());
         							
         BindingOperationInfo operation = findOperation(binding.getOperations(), operationName);
         
