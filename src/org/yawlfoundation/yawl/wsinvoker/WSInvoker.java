@@ -105,7 +105,7 @@ public class WSInvoker {
         							
         BindingOperationInfo operation = findOperation(binding.getOperations(), operationName);
         
-        _log.warn("Operation: " + operation);
+        _log.warn("Operation: " + operation.getName());
         
         BindingMessageInfo inputMessageInfo = operation.getInput();
         List<MessagePartInfo> parts = inputMessageInfo.getMessageParts();
